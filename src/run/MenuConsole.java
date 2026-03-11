@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class MenuConsole {
     public static void MenuItemConsole(Scanner sc) {
-
+        System.out.println("menu");
     }
 
     public static void OrderConsole(Scanner sc) {
