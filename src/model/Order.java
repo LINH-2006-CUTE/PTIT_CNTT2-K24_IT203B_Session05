@@ -1,19 +1,22 @@
 package model;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Order {
-    private String id;
+    private final String id;
     private Map<MenuItem, Integer> items = new HashMap<>();
     private double totalPrice;
     private OrderStatus status;
+    private final LocalDateTime createdAt;
 
-    public Order(String id, Map<MenuItem, Integer> items, double totalPrice, OrderStatus status) {
+    public Order(String id) {
         this.id = id;
-        this.items = items;
-        this.totalPrice = totalPrice;
-        this.status = status;
+        this.items = new HashMap<>();
+        this.totalPrice = 0;
+        this.status = OrderStatus.PENDING;
+        this.createdAt = LocalDateTime.now();
     }
 
     public String getId() {
@@ -44,8 +47,17 @@ public class Order {
         this.status = status;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
     public void addItem(MenuItem item, int quantity) {
         items.put(item,items.getOrDefault(item,0)+quantity);
         totalPrice += item.calculatedPrice() * quantity;
+    }
+
+    @Override
+    public String toString() {
+        return "ID : " + id + " Total Price : " + totalPrice + " Status : " + status;
     }
 }

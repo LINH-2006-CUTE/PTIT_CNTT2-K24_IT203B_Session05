@@ -1,17 +1,22 @@
 package run;
 
 import model.*;
+import repository.MenuRepository;
 import service.MenuManagement;
 import service.OrderManagement;
 import service.SearchService;
+import service.StatisticService;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class MenuConsole {
     static MenuManagement menuManagement = new MenuManagement();
     static SearchService searchService = new SearchService();
     static OrderManagement orderManagement = new OrderManagement();
+    static StatisticService statisticService = new StatisticService();
 
     // Menu Item
     public static void MenuItemConsole(Scanner sc) {
@@ -49,7 +54,7 @@ public class MenuConsole {
                                 """);
                         System.out.print("Lựa chọn của bạn: ");
                         subChoice = Integer.parseInt(sc.nextLine());
-                        switch (subChoice){
+                        switch (subChoice) {
                             case 1:
                                 searchPriceService(sc);
                                 break;
@@ -61,17 +66,17 @@ public class MenuConsole {
                             default:
                                 System.out.println("Lựa chọn không hợp lệ");
                         }
-                    }while(subChoice != 0);
+                    } while (subChoice != 0);
                     break;
                 case 5:
-                    System.out.println("case 5");
+                    menuManagement.displayAll();
                     break;
                 case 0:
                     break;
                 default:
                     System.out.println("Lựa chọn không hợp lệ");
             }
-        }while(choice != 0);
+        } while (choice != 0);
     }
 
     // Menu order
@@ -82,8 +87,8 @@ public class MenuConsole {
             System.out.println("===== ORDER MANAGEMENT =====");
             System.out.println("1. Tạo đơn hàng mới cho khách hàng");
             System.out.println("2. Thêm món ăn vào giỏ hàng");
-            System.out.println("3. Áp dụng mã giảm giá");
-            System.out.println("4. Cập nhật trạng thái đơn hàng");
+            System.out.println("3. Cập nhật trạng thái đơn hàng");
+            System.out.println("4. Tìm kiếm đơn hàng");
             System.out.println("0. Thoát");
             System.out.print("Lựa chọn của bạn: ");
 
@@ -91,23 +96,23 @@ public class MenuConsole {
 
             switch (choice) {
                 case 1:
-                    System.out.println("Case 1");
+                    createOrder(sc);
                     break;
                 case 2:
-                    System.out.println("case 2");
+                    addItemToOrder(sc);
                     break;
                 case 3:
-                    System.out.println("case 3");
+                    updateOrderStatus(sc);
                     break;
                 case 4:
-                    System.out.println("case 4");
+                    searchOrder(sc);
                     break;
                 case 0:
                     break;
                 default:
                     System.out.println("Lựa chọn không hợp lệ");
             }
-        }while(choice != 0);
+        } while (choice != 0);
 
     }
 
@@ -136,23 +141,23 @@ public class MenuConsole {
                                 """);
                         System.out.print("Lựa chọn của bạn: ");
                         subChoice = Integer.parseInt(sc.nextLine());
-                        switch (subChoice){
+                        switch (subChoice) {
                             case 1:
-                                System.out.println("Tìm kiếm theo giá");
+                                searchPriceService(sc);
                                 break;
                             case 2:
-                                System.out.println("Tìm kiếm theo tên");
+                                searchNameService(sc);
                                 break;
                             case 0:
                                 break;
                         }
-                    }while(subChoice != 0);
+                    } while (subChoice != 0);
                     break;
                 case 2:
-                    System.out.println("Thống kê tổng doanh thu");
+                    statisticWithMonth(sc);
                     break;
                 case 3:
-                    System.out.println("Danh sách các món ăn bán chạy nhất");
+                    topSeller();
                     break;
                 case 0:
                     break;
@@ -177,7 +182,13 @@ public class MenuConsole {
         System.out.print("Nhập tên: ");
         String name = sc.nextLine();
         System.out.print("Nhập giá cơ bản: ");
-        double basePrice = Double.parseDouble(sc.nextLine());
+        double basePrice;
+        try {
+            basePrice = Double.parseDouble(sc.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Giá tiền không hợp lệ!");
+            return;
+        }
         MenuItem item = null;
 
         switch (type) {
@@ -251,33 +262,37 @@ public class MenuConsole {
     }
 
     // Tìm kiếm món ăn theo tên
-    public static void searchNameService(Scanner sc){
+    public static void searchNameService(Scanner sc) {
         System.out.print("Nhập tên món ăn cần tìm kiếm");
         String nameItem = sc.nextLine();
-        searchService.findByName(nameItem);
+        List<MenuItem> result = searchService.findByName(nameItem);
+        result.forEach(System.out::println);
     }
 
     // Tìm kiếm món ăn theo giá
-    public static void searchPriceService(Scanner sc){
+    public static void searchPriceService(Scanner sc) {
         System.out.print("Nhập vào giá nhỏ nhất: ");
         double minPrice = Double.parseDouble(sc.nextLine());
 
         System.out.print("Nhập vào giá lớn nhất: ");
         double maxPrice = Double.parseDouble(sc.nextLine());
 
-        searchService.findByPriceRange(minPrice, maxPrice);
+        List<MenuItem> results = searchService.findByPriceRange(minPrice, maxPrice);
+        if (results != null) {
+            results.forEach(System.out::println);
+        }
     }
 
     // Tạo order
-    public static void createOrder(Scanner sc){
+    public static void createOrder(Scanner sc) {
         System.out.print("Nhập ID đơn hàng: ");
         String id = sc.nextLine();
-        Order order = new Order(id,new HashMap<>(),0,OrderStatus.PENDING);
+        Order order = new Order(id);
         orderManagement.create(order);
     }
 
     // Thêm món vào order
-    public static void addItemToOrder(Scanner sc){
+    public static void addItemToOrder(Scanner sc) {
         System.out.print("Nhập ID đơn hàng: ");
         String orderId = sc.nextLine();
 
@@ -287,14 +302,56 @@ public class MenuConsole {
         System.out.print("Nhập số lượng: ");
         int quantity = Integer.parseInt(sc.nextLine());
 
-        MenuItem item = menuManagement.findById(itemId);
+        orderManagement.addItem(orderId, itemId, quantity);
+    }
 
-        if(item == null){
-            System.out.println("Không tìm thấy món ăn!");
-            return;
+    //Cập nhật trạng thái đơn hàng
+    public static void updateOrderStatus(Scanner sc) {
+        int choice;
+        System.out.print("Nhập ID đơn hàng: ");
+        String orderId = sc.nextLine();
+
+        do {
+            System.out.println("---------Danh sách trạng thái---------");
+            System.out.println("1. PENDING");
+            System.out.println("2. PAID");
+            System.out.println("3. CANCELLED");
+            System.out.println("0. Thoát");
+            System.out.print("Lựa chọn của bạn: ");
+            choice = Integer.parseInt(sc.nextLine());
+            switch (choice) {
+                case 1 -> orderManagement.updateStatus(orderId, OrderStatus.PENDING);
+                case 2 -> orderManagement.updateStatus(orderId, OrderStatus.PAID);
+                case 3 -> orderManagement.updateStatus(orderId, OrderStatus.CANCELLED);
+                default -> System.out.println("Lựa chọn không phù hợp!");
+            }
+        } while (choice != 0);
+
+    }
+
+    // tìm kiếm đơn hàng
+    public static void searchOrder(Scanner sc) {
+        System.out.print("Nhập ID đơn hàng: ");
+        String orderId = sc.nextLine();
+        orderManagement.displayOrder(orderId);
+    }
+
+    // Doanh thu theo tháng
+    public static void statisticWithMonth(Scanner sc) {
+        System.out.println("Nhập tháng cần tính : ");
+        int month = Integer.parseInt(sc.nextLine());
+        double total = statisticService.calculatedTotalRevenue(month);
+        if (total > 0) {
+            System.out.println("Doanh thu của tháng " + month + " : " + total);
         }
+    }
 
-        orderManagement.addItem(orderId,item,quantity);
-
+    // top seller
+    public static void topSeller() {
+        System.out.println("Danh sách sản phẩm bán chạy nhất hiện tại : ");
+        Map<MenuItem, Integer> topItems = statisticService.getTopSellingItems();
+        topItems.forEach((item, quantity) -> {
+            System.out.println(item + " - " + quantity);
+        });
     }
 }

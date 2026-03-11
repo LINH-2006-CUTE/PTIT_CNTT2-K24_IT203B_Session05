@@ -19,7 +19,10 @@ public class SearchService implements ISearchService {
 
     @Override
     public List<MenuItem> findByPriceRange(double minPrice, double maxPrice) {
-
+        if(maxPrice < minPrice) {
+            System.out.println("Giá trị không hợp lệ!");
+            return null;
+        }
         return MenuRepository.menuItems.stream()
                 .filter(element -> element.getBasePrice() >= minPrice
                         && element.getBasePrice() <= maxPrice)

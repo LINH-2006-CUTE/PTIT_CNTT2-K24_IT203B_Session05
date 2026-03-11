@@ -11,6 +11,10 @@ public class MenuManagement implements IMenuService {
             System.out.println("Dữ liệu món ăn không được trống");
             return;
         }
+        if(MenuRepository.findItemById(item.getId()) != null) {
+            System.out.println("Id sản phẩm đã tồn tại!");
+            return;
+        }
 
         MenuRepository.menuItems.add(item);
         System.out.println("Đã thêm món ăn thành công");
@@ -24,7 +28,7 @@ public class MenuManagement implements IMenuService {
             MenuItem existingItem = foundItem.get();
 
             existingItem.setName(updateItem.getName());
-            existingItem.setPrice(updateItem.getPrice());
+            existingItem.setBasePrice(updateItem.getBasePrice());
 
             System.out.println("Cập nhật thành công");
         } else {

@@ -9,6 +9,7 @@ import java.util.Scanner;
 
 public interface IOrderService {
     void create(Order order);
-    void updateStatus(String id, OrderStatus orderStatus);
-    void addItem(String orderId,String itemId, int quantity);
+    void updateStatus(String id, OrderStatus orderStatus) throws InvalidOrderIdException;
+    void addItem(String orderId,String itemId, int quantity) throws InvalidOrderIdException;
+    void displayOrder(String orderId) throws InvalidOrderIdException;
 }
