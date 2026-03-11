@@ -16,6 +16,10 @@ public class Order {
         this.status = status;
     }
 
+    public String getId() {
+        return id;
+    }
+
     public Map<MenuItem, Integer> getItems() {
         return items;
     }
@@ -38,5 +42,10 @@ public class Order {
 
     public void setStatus(OrderStatus status) {
         this.status = status;
+    }
+
+    public void addItem(MenuItem item, int quantity) {
+        items.put(item,items.getOrDefault(item,0)+quantity);
+        totalPrice += item.calculatedPrice() * quantity;
     }
 }
