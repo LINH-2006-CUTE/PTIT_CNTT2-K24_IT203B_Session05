@@ -1,6 +1,7 @@
 package service;
 
-import java.awt.*;
+import model.MenuItem;
+
 import java.util.List;
 
 public interface ISearchService {
