@@ -18,6 +18,10 @@ public class StatisticService implements IStatisticService {
             System.out.println("Tháng không phù hợp!");
             return -1;
         }
+        System.out.println("sum : "+OrderRepository.orders.stream().filter(order -> order.getCreatedAt().getMonthValue() == month && order.getStatus() == OrderStatus.PAID)
+                .mapToDouble(Order::getTotalPrice)
+                .sum());
+
         return OrderRepository.orders.stream().filter(order -> order.getCreatedAt().getMonthValue() == month && order.getStatus() == OrderStatus.PAID)
                 .mapToDouble(Order::getTotalPrice)
                 .sum();
